@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Personalized Learning</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-deep: #0D4F4F;
+            --primary-main: #1A7A7A;
+            --primary-light: #2BA3A3;
+            --primary-glow: rgba(43, 163, 163, 0.15);
+            --accent-deep: #B85450;
+            --accent-main: #E86B67;
+            --accent-light: #FF9E9A;
+            --accent-glow: rgba(232, 107, 103, 0.15);
+            --success-deep: #1B5E3D;
+            --success-main: #2D8B5A;
+            --success-light: #4ABA7A;
+            --success-glow: rgba(45, 139, 90, 0.15);
+            --warning-deep: #B8860B;
+            --warning-main: #DAA520;
+            --bg-body: #F7F9FC;
+            --bg-soft: #EEF2F7;
+            --text-primary: #1A2B3C;
+            --text-secondary: #5A6B7C;
+            --text-muted: #8A9BAC;
+            --border-light: rgba(26, 43, 60, 0.08);
+            --gradient-primary: linear-gradient(135deg, var(--primary-deep) 0%, var(--primary-main) 50%, var(--primary-light) 100%);
+            --gradient-success: linear-gradient(135deg, var(--success-deep) 0%, var(--success-main) 100%);
+            --gradient-accent: linear-gradient(135deg, var(--accent-deep) 0%, var(--accent-main) 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+
+        /* Navbar */
+        .nav-premium {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-light);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-brand:hover {
+            transform: translateX(5px);
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .brand-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Quiz Container */
+        .quiz-container {
+            max-width: 800px;
+            margin: 1rem auto;
+            padding: 0 1rem;
+        }
+
+        /* Quiz Header - Compact */
+        .quiz-header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1.25rem 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 1rem;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .quiz-header.selection-mode {
+            display: block;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .quiz-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+
+        .quiz-header h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .quiz-header p {
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        /* Cards */
+        .premium-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.25rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid var(--border-light);
+            margin-bottom: 0;
+        }
+
+        @keyframes cardSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .premium-card h4 {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .premium-card h4 i {
+            color: var(--primary-main);
+        }
+
+        /* Form Controls */
+        .form-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-select {
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 0.875rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus {
+            border-color: var(--primary-main);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+
+        /* Buttons */
+        .btn-premium {
+            padding: 14px 32px;
+            border-radius: 14px;
+            font-weight: 600;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .btn-premium.primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .btn-premium.primary:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(26, 122, 122, 0.35);
+        }
+
+        .btn-premium.primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-premium.success {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .btn-premium.success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px var(--success-glow);
+        }
+
+        .btn-premium.warning {
+            background: linear-gradient(135deg, var(--warning-deep), var(--warning-main));
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border-light);
+            color: var(--text-secondary);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary-main);
+            color: var(--primary-main);
+            background: var(--primary-glow);
+        }
+
+        /* Progress */
+        .progress-section {
+            margin-bottom: 0.75rem;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .progress-premium {
+            height: 10px;
+            background: var(--bg-soft);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-premium {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .level-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: var(--primary-glow);
+            color: var(--primary-deep);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Question */
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        /* Options */
+        .option-card {
+            border: 2px solid var(--border-light);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-main);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .option-card:hover {
+            border-color: var(--primary-light);
+            background: var(--primary-glow);
+            transform: translateX(5px);
+        }
+
+        .option-card:hover::before {
+            transform: scaleY(1);
+        }
+
+        .option-card.selected {
+            border-color: var(--primary-main);
+            background: var(--primary-glow);
+        }
+
+        .option-card.selected::before {
+            transform: scaleY(1);
+        }
+
+        .option-card .form-check-input {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+        }
+
+        .option-card .form-check-input:checked {
+            background-color: var(--primary-main);
+            border-color: var(--primary-main);
+        }
+
+        .option-card .form-check-label {
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Navigation */
+        .quiz-navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 1rem;
+            border-top: 1px solid var(--border-light);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-btn.prev {
+            background: var(--bg-soft);
+            color: var(--text-secondary);
+        }
+
+        .nav-btn.prev:hover:not(:disabled) {
+            background: #e0e5eb;
+        }
+
+        .nav-btn.prev:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .nav-btn.next {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .nav-btn.next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--primary-glow);
+        }
+
+        .nav-btn.finish {
+            background: var(--gradient-success);
+            color: white;
+        }
+
+        .nav-btn.finish:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--success-glow);
+        }
+
+        /* Results */
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 2.5rem;
+            font-weight: 800;
+            box-shadow: 0 10px 40px var(--primary-glow);
+            animation: scorePopIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes scorePopIn {
+            0% {
+                transform: scale(0);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .result-alert {
+            border-radius: 16px;
+            border: none;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-alert.success {
+            background: linear-gradient(135deg, rgba(45, 139, 90, 0.15), rgba(74, 186, 122, 0.1));
+            color: var(--success-deep);
+        }
+
+        .result-alert.info {
+            background: linear-gradient(135deg, var(--primary-glow), rgba(43, 163, 163, 0.1));
+            color: var(--primary-deep);
+        }
+
+        .result-alert.warning {
+            background: linear-gradient(135deg, rgba(218, 165, 32, 0.15), rgba(244, 196, 48, 0.1));
+            color: var(--warning-deep);
+        }
+
+        .result-alert strong {
+            font-size: 1.1rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .quiz-header {
+                padding: 1.5rem;
+            }
+
+            .quiz-header h2 {
+                font-size: 1.4rem;
+            }
+
+            .premium-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="nav-premium">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="/dashboard" class="nav-brand">
+                    <div class="brand-icon">
+                        <i class="bi bi-mortarboard-fill"></i>
+                    </div>
+                    <span class="brand-text">LearnPro</span>
+                </a>
+                <a href="/dashboard" class="btn-outline">
+                    <i class="bi bi-arrow-left"></i>
+                    Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="quiz-container">
+        <!-- Quiz Header -->
+        <div class="quiz-header text-center">
+            <h2 id="quizTitle">
+                <i class="bi bi-lightbulb-fill"></i>
+                Knowledge Quiz
+            </h2>
+            <p id="quizInfo">Test your skills and track your progress</p>
+        </div>
+
+        <!-- Quiz Selection -->
+        <div id="quizSelection" class="premium-card">
+            <h4><i class="bi bi-sliders"></i> Select Quiz Options</h4>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <label for="courseSelect" class="form-label">Select Course</label>
+                    <select class="form-select" id="courseSelect">
+                        <option value="">Loading courses...</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label for="levelSelect" class="form-label">Difficulty Level</label>
+                    <select class="form-select" id="levelSelect">
+                        <option value="">Choose level</option>
+                        <option value="basic">🟢 Basic</option>
+                        <option value="intermediate">🟡 Intermediate</option>
+                        <option value="advanced">🔴 Advanced</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="button" class="btn-premium primary" id="startQuizBtn" disabled>
+                    <i class="bi bi-play-fill"></i> Start Quiz
+                </button>
+            </div>
+        </div>
+
+        <!-- Quiz Content -->
+        <div id="quizContent" style="display: none;">
+            <div class="progress-section">
+                <div class="progress-info">
+                    <span id="questionCounter">Question 1 of 20</span>
+                    <span id="levelBadge" class="level-badge">
+                        <i class="bi bi-bar-chart-fill"></i> Basic
+                    </span>
+                </div>
+                <div class="progress-premium">
+                    <div id="progressBar" class="progress-bar-premium" style="width: 5%"></div>
+                </div>
+            </div>
+
+            <div class="premium-card">
+                <p id="questionText" class="question-text">Question will appear here</p>
+                <div id="optionsContainer"></div>
+            </div>
+        </div>
+
+        <!-- Quiz Results -->
+        <div id="quizResults" style="display: none;">
+            <div class="premium-card text-center">
+                <h3 class="mb-4" style="font-weight: 700;">
+                    <i class="bi bi-trophy-fill text-warning me-2"></i>
+                    Quiz Complete!
+                </h3>
+                <div id="scoreCircle" class="score-circle">0%</div>
+                <div id="scoreDetails" class="mb-4">
+                    <h5 style="font-weight: 600;">Your Score</h5>
+                    <p class="text-muted">0 out of 0 correct</p>
+                </div>
+                <div id="resultMessage" class="mb-4"></div>
+                <div class="d-flex flex-wrap gap-3 justify-content-center">
+                    <button type="button" class="btn-premium primary" onclick="retakeQuiz()">
+                        <i class="bi bi-arrow-repeat"></i> Take Another Quiz
+                    </button>
+                    <form id="reviewForm" method="POST" action="/quiz_review" style="display:inline;">
+                        <input type="hidden" name="answers" id="reviewAnswersInput">
+                        <button type="submit" class="btn-premium warning">
+                            <i class="bi bi-search"></i> Review Answers
+                        </button>
+                    </form>
+                    <a href="/dashboard" class="btn-outline">
+                        <i class="bi bi-house-fill"></i> Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div id="quizNavigation" class="quiz-navigation" style="display: none;">
+        <div class="container" style="max-width: 800px;">
+            <div class="d-flex justify-content-between align-items-center">
+                <button type="button" class="nav-btn prev" id="prevBtn" onclick="previousQuestion()">
+                    <i class="bi bi-arrow-left"></i> Previous
+                </button>
+                <span id="navQuestionCounter" class="text-muted fw-medium">Question 1 of 20</span>
+                <button type="button" class="nav-btn next" id="nextBtn" onclick="nextQuestion()">
+                    Next <i class="bi bi-arrow-right"></i>
+                </button>
+                <button type="button" class="nav-btn finish" id="finishBtn" onclick="finishQuiz()"
+                    style="display: none;">
+                    <i class="bi bi-check-lg"></i> Finish Quiz
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentQuiz = {
+            questions: [],
+            currentQuestion: 0,
+            answers: {},
+            courseId: null,
+            level: null,
+            courseName: ''
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadAvailableCourses();
+            setupEventListeners();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const courseParam = urlParams.get('course');
+            const levelParam = urlParams.get('level');
+
+            if (courseParam && levelParam) {
+                setTimeout(() => {
+                    const courseSelect = document.getElementById('courseSelect');
+                    const levelSelect = document.getElementById('levelSelect');
+                    courseSelect.value = courseParam;
+                    levelSelect.value = levelParam;
+                    const courseName = courseSelect.options[courseSelect.selectedIndex]?.text || 'Selected Course';
+                    loadQuizQuestions(courseParam, levelParam, courseName);
+                }, 1000);
+            }
+        });
+
+        function setupEventListeners() {
+            const courseSelect = document.getElementById('courseSelect');
+            const levelSelect = document.getElementById('levelSelect');
+            const startQuizBtn = document.getElementById('startQuizBtn');
+
+            function checkSelections() {
+                startQuizBtn.disabled = !(courseSelect.value && levelSelect.value);
+            }
+
+            courseSelect.addEventListener('change', checkSelections);
+            levelSelect.addEventListener('change', checkSelections);
+
+            startQuizBtn.addEventListener('click', function () {
+                const selectedCourse = courseSelect.value;
+                const selectedLevel = levelSelect.value;
+                const courseName = courseSelect.options[courseSelect.selectedIndex].text;
+
+                if (selectedCourse && selectedLevel) {
+                    loadQuizQuestions(selectedCourse, selectedLevel, courseName);
+                }
+            });
+        }
+
+        function loadAvailableCourses() {
+            fetch('/api/quiz/available-courses')
+                .then(response => response.json())
+                .then(data => {
+                    const courseSelect = document.getElementById('courseSelect');
+                    courseSelect.innerHTML = '<option value="">Choose a course...</option>';
+
+                    if (data.courses) {
+                        data.courses.forEach(course => {
+                            const option = document.createElement('option');
+                            option.value = course.id;
+                            option.textContent = course.title;
+                            courseSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading courses:', error);
+                    document.getElementById('courseSelect').innerHTML = '<option value="">Error loading courses</option>';
+                });
+        }
+
+        function loadQuizQuestions(courseId, level, courseName) {
+            currentQuiz.courseId = courseId;
+            currentQuiz.level = level;
+            currentQuiz.courseName = courseName;
+            currentQuiz.currentQuestion = 0;
+            currentQuiz.answers = {};
+
+            document.getElementById('quizTitle').innerHTML = `<i class="bi bi-lightbulb-fill"></i> ${courseName} Quiz`;
+            document.getElementById('quizInfo').textContent = `${level.charAt(0).toUpperCase() + level.slice(1)} Level`;
+            document.getElementById('quizSelection').style.display = 'none';
+            document.getElementById('quizContent').style.display = 'block';
+            document.getElementById('questionText').textContent = 'Loading questions...';
+
+            fetch(`/quiz/questions/${courseId}/${level}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.questions && data.questions.length > 0) {
+                        currentQuiz.questions = data.questions;
+                        startQuiz();
+                    } else {
+                        showError('No questions available for this combination.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('Error loading quiz questions.');
+                });
+        }
+
+        function startQuiz() {
+            const levelText = currentQuiz.level.charAt(0).toUpperCase() + currentQuiz.level.slice(1);
+            document.getElementById('levelBadge').innerHTML = `<i class="bi bi-bar-chart-fill"></i> ${levelText}`;
+            document.getElementById('quizNavigation').style.display = 'block';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = currentQuiz.questions[currentQuiz.currentQuestion];
+            const total = currentQuiz.questions.length;
+            const num = currentQuiz.currentQuestion + 1;
+            const progress = (num / total) * 100;
+
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('questionCounter').textContent = `Question ${num} of ${total}`;
+            document.getElementById('navQuestionCounter').textContent = `Question ${num} of ${total}`;
+            document.getElementById('questionText').textContent = question.question;
+
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const optionCard = document.createElement('div');
+                optionCard.className = 'option-card';
+                optionCard.innerHTML = `
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="question_${currentQuiz.currentQuestion}" 
+                               id="option_${index}" value="${index}">
+                        <label class="form-check-label w-100" for="option_${index}">${option}</label>
+                    </div>
+                `;
+                optionCard.addEventListener('click', function () {
+                    document.getElementById(`option_${index}`).checked = true;
+                    updateOptionStyles();
+                });
+                optionsContainer.appendChild(optionCard);
+            });
+
+            if (currentQuiz.answers[currentQuiz.currentQuestion] !== undefined) {
+                document.getElementById(`option_${currentQuiz.answers[currentQuiz.currentQuestion]}`).checked = true;
+                updateOptionStyles();
+            }
+
+            document.getElementById('prevBtn').disabled = currentQuiz.currentQuestion === 0;
+
+            if (currentQuiz.currentQuestion === total - 1) {
+                document.getElementById('nextBtn').style.display = 'none';
+                document.getElementById('finishBtn').style.display = 'inline-flex';
+            } else {
+                document.getElementById('nextBtn').style.display = 'inline-flex';
+                document.getElementById('finishBtn').style.display = 'none';
+            }
+        }
+
+        function updateOptionStyles() {
+            document.querySelectorAll('.option-card').forEach(option => {
+                const radio = option.querySelector('input[type="radio"]');
+                option.classList.toggle('selected', radio.checked);
+            });
+        }
+
+        function nextQuestion() {
+            saveCurrentAnswer();
+            if (currentQuiz.currentQuestion < currentQuiz.questions.length - 1) {
+                currentQuiz.currentQuestion++;
+                showQuestion();
+            }
+        }
+
+        function previousQuestion() {
+            saveCurrentAnswer();
+            if (currentQuiz.currentQuestion > 0) {
+                currentQuiz.currentQuestion--;
+                showQuestion();
+            }
+        }
+
+        function saveCurrentAnswer() {
+            const selected = document.querySelector(`input[name="question_${currentQuiz.currentQuestion}"]:checked`);
+            if (selected) {
+                currentQuiz.answers[currentQuiz.currentQuestion] = parseInt(selected.value);
+            }
+        }
+
+        function finishQuiz() {
+            saveCurrentAnswer();
+
+            let correct = 0;
+            currentQuiz.questions.forEach((question, index) => {
+                if (currentQuiz.answers[index] !== undefined) {
+                    const userAnswer = currentQuiz.answers[index];
+                    const correctAnswer = question.correct_answer;
+
+                    let isCorrect = false;
+                    if (typeof correctAnswer === 'number') {
+                        isCorrect = userAnswer === correctAnswer;
+                    } else {
+                        isCorrect = question.options[userAnswer] === correctAnswer;
+                    }
+                    if (isCorrect) correct++;
+                }
+            });
+
+            const score = Math.round((correct / currentQuiz.questions.length) * 100);
+            showResults(score, correct, currentQuiz.questions.length);
+        }
+
+        function showResults(score, correct, total) {
+            document.getElementById('quizContent').style.display = 'none';
+            document.getElementById('quizNavigation').style.display = 'none';
+            document.getElementById('quizResults').style.display = 'block';
+
+            document.getElementById('scoreCircle').textContent = score + '%';
+            document.getElementById('scoreDetails').innerHTML = `
+                <h5 style="font-weight: 600;">Your Score</h5>
+                <p class="text-muted">${correct} out of ${total} correct</p>
+            `;
+
+            const resultMessage = document.getElementById('resultMessage');
+            if (score >= 80) {
+                resultMessage.innerHTML = `
+                    <div class="result-alert success">
+                        <i class="bi bi-star-fill me-2"></i>
+                        <strong>Excellent Work!</strong>
+                        You've demonstrated great understanding of the material. Keep up the amazing progress!
+                    </div>`;
+            } else if (score >= 60) {
+                resultMessage.innerHTML = `
+                    <div class="result-alert info">
+                        <i class="bi bi-graph-up me-2"></i>
+                        <strong>Good Progress!</strong>
+                        You're on the right track. A bit more practice will get you to expert level!
+                    </div>`;
+            } else {
+                resultMessage.innerHTML = `
+                    <div class="result-alert warning">
+                        <i class="bi bi-lightbulb me-2"></i>
+                        <strong>Keep Learning!</strong>
+                        Every attempt builds your knowledge. Review the material and try again!
+                    </div>`;
+            }
+
+            const reviewInput = document.getElementById('reviewAnswersInput');
+            if (reviewInput) {
+                const reviewData = currentQuiz.questions.map((q, idx) => ({
+                    question: q.question,
+                    options: q.options,
+                    user_answer: q.options[currentQuiz.answers[idx]],
+                    correct_answer: typeof q.correct_answer === 'number' ? q.options[q.correct_answer] : q.correct_answer,
+                    explanation: q.explanation || ''
+                }));
+                reviewInput.value = JSON.stringify(reviewData);
+            }
+        }
+
+        function retakeQuiz() {
+            currentQuiz = { questions: [], currentQuestion: 0, answers: {}, courseId: null, level: null, courseName: '' };
+            document.getElementById('quizSelection').style.display = 'block';
+            document.getElementById('quizContent').style.display = 'none';
+            document.getElementById('quizResults').style.display = 'none';
+            document.getElementById('quizNavigation').style.display = 'none';
+            document.getElementById('quizTitle').innerHTML = '<i class="bi bi-lightbulb-fill"></i> Knowledge Quiz';
+            document.getElementById('quizInfo').textContent = 'Test your skills and track your progress';
+            document.getElementById('courseSelect').value = '';
+            document.getElementById('levelSelect').value = '';
+            document.getElementById('startQuizBtn').disabled = true;
+        }
+
+        function showError(message) {
+            document.getElementById('questionText').textContent = 'Error';
+            document.getElementById('optionsContainer').innerHTML = `
+                <div class="result-alert warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i> ${message}
+                </div>
+                <button type="button" class="btn-premium primary" onclick="retakeQuiz()">
+                    <i class="bi bi-arrow-left"></i> Back to Selection
+                </button>
+            `;
+            document.getElementById('quizNavigation').style.display = 'none';
+        }
+    </script>
+</body>
+
+</html>
